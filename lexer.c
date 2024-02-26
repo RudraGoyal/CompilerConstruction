@@ -1,385 +1,475 @@
-#include "lexer.h"
+#include<stdio.h>
+#include<ctype.h>
+#include<stdlib.h>
+#include<string.h>
 
-TokenType getTokenType(const char* lexeme){
-    if (!strcmp(lexeme, "<---")) 
-        return TK_ASSIGNOP;
-    else if (!strcmp(lexeme, "%%")) 
-        return TK_COMMENT;
-    else if (!strcmp(lexeme, "with")) 
-        return TK_WITH;
-    else if (!strcmp(lexeme, "parameters")) 
-        return TK_PARAMETERS;
-    else if (!strcmp(lexeme, "end")) 
-        return TK_END;
-    else if (!strcmp(lexeme, "while")) 
-        return TK_WHILE;
-    else if (!strcmp(lexeme, "union")) 
-        return TK_UNION;
-    else if (!strcmp(lexeme, "endunion")) 
-        return TK_ENDUNION;
-    else if (!strcmp(lexeme, "definetype")) 
-        return TK_DEFINETYPE;
-    else if (!strcmp(lexeme, "as")) 
-        return TK_AS;
-    else if (!strcmp(lexeme, "type")) 
-        return TK_TYPE;
-    else if (!strcmp(lexeme, "_main")) 
-        return TK_MAIN;
-    else if (!strcmp(lexeme, "global")) 
-        return TK_GLOBAL;
-    else if (!strcmp(lexeme, "parameter")) 
-        return TK_PARAMETER;
-    else if (!strcmp(lexeme, "list")) 
-        return TK_LIST;
-    else if (!strcmp(lexeme, "[")) 
-        return TK_SQL;
-    else if (!strcmp(lexeme, "]")) 
-        return TK_SQR;
-    else if (!strcmp(lexeme, "input")) 
-        return TK_INPUT;
-    else if (!strcmp(lexeme, "output")) 
-        return TK_OUTPUT;
-    else if (!strcmp(lexeme, "int")) 
-        return TK_INT;
-    else if (!strcmp(lexeme, "real")) 
-        return TK_REAL;
-    else if (!strcmp(lexeme, ",")) 
-        return TK_COMMA;
-    else if (!strcmp(lexeme, ";")) 
-        return TK_SEM;
-    else if (!strcmp(lexeme, ":")) 
-        return TK_COLON;
-    else if (!strcmp(lexeme, ".")) 
-        return TK_DOT;
-    else if (!strcmp(lexeme, "endwhile")) 
-        return TK_ENDWHILE;
-    else if (!strcmp(lexeme, "(")) 
-        return TK_OP;
-    else if (!strcmp(lexeme, ")")) 
-        return TK_CL;
-    else if (!strcmp(lexeme, "if")) 
-        return TK_IF;
-    else if (!strcmp(lexeme, "then")) 
-        return TK_THEN;
-    else if (!strcmp(lexeme, "endif")) 
-        return TK_ENDIF;
-    else if (!strcmp(lexeme, "read")) 
-        return TK_READ;
-    else if (!strcmp(lexeme, "write")) 
-        return TK_WRITE;
-    else if (!strcmp(lexeme, "return")) 
-        return TK_RETURN;
-    else if (!strcmp(lexeme, "+")) 
-        return TK_PLUS;
-    else if (!strcmp(lexeme, "-")) 
-        return TK_MINUS;
-    else if (!strcmp(lexeme, "*")) 
-        return TK_MUL;
-    else if (!strcmp(lexeme, "/")) 
-        return TK_DIV;
-    else if (!strcmp(lexeme, "call")) 
-        return TK_CALL;
-    else if (!strcmp(lexeme, "record")) 
-        return TK_RECORD;
-    else if (!strcmp(lexeme, "endrecord")) 
-        return TK_ENDRECORD;
-    else if (!strcmp(lexeme, "else")) 
-        return TK_ELSE;
-    else if (!strcmp(lexeme, "&&&")) 
-        return TK_AND;
-    else if (!strcmp(lexeme, "@@@")) 
-        return TK_OR;
-    else if (!strcmp(lexeme, "~")) 
-        return TK_NOT;
-    else if (!strcmp(lexeme, "<")) 
-        return TK_LT;
-    else if (!strcmp(lexeme, "<=")) 
-        return TK_LE;
-    else if (!strcmp(lexeme, "==")) 
-        return TK_EQ;
-    else if (!strcmp(lexeme, ">")) 
-        return TK_GT;
-    else if (!strcmp(lexeme, ">=")) 
-        return TK_GE;
-    else if (!strcmp(lexeme, "!=")) 
-        return TK_NE;
 
-}
-
-Token getNextToken(FILE* fp, char buffer[][BUFFER_SIZE], int bufsize, int* bufferIndex) {
-    Token token;
-    token.type = TK_END;
-    char lexeme[MAX_TOKEN_SIZE] = "";
-    int lexemeIndex = 0;
-    char c;
-
-    while (1) {
-        c = buffer[0][*bufferIndex];
-        if (isspace(c) || c == '\0') {
-            if (lexemeIndex > 0) {
-                strncpy(token.lexeme, lexeme, lexemeIndex);
-                token.lexeme[lexemeIndex] = '\0';
-                // printf("%s\n",lexeme);
-                token.type = getTokenType(token.lexeme);
-                return token;
-            }
-            if (c == '\0') {
-                break;
-            }
-            (*bufferIndex)++;
-            continue;
-        }
-        lexeme[lexemeIndex++] = c;
-        (*bufferIndex)++;
-    }
-
-    return token;
-}
-
-FILE* getStream(FILE* fp, char buffer[][BUFFER_SIZE], int bufsize) {
-    int count;
-    if (!feof(fp))
-        count = fread(buffer[0], 1, bufsize, fp);
-
-    if (count < bufsize)
-        buffer[0][count] = '\0';
-
-    return fp;
-}
-
-void printToken(Token token)
+int isAlpha(char c)
 {
-    switch (token.type){
-    case TK_ASSIGNOP:
-        printf("ASSIGN: %s\n", token.lexeme);
-        break;
-    case TK_COMMENT:
-        printf("Comment: %s\n", token.lexeme);
-        break;
-    case TK_WITH:
-        printf("WITH: %s\n", token.lexeme);
-        break;
-    case TK_PARAMETERS:
-        printf("PARAMETERS: %s\n", token.lexeme);
-        break;
-    case TK_END:
-        printf("END: %s\n", token.lexeme);
-        break;
-    case TK_WHILE:
-        printf("WHILE: %s\n", token.lexeme);
-        break;
-    case TK_UNION:
-        printf("UNION: %s\n", token.lexeme);
-        break;
-    case TK_ENDUNION:
-        printf("ENDUNION: %s\n", token.lexeme);
-        break;
-    case TK_DEFINETYPE:
-        printf("DEFINETYPE: %s\n", token.lexeme);
-        break;
-    case TK_AS:
-        printf("AS: %s\n", token.lexeme);
-        break;
-    case TK_TYPE:
-        printf("TYPE: %s\n", token.lexeme);
-        break;
-    case TK_MAIN:
-        printf("MAIN: %s\n", token.lexeme);
-        break;
-    case TK_GLOBAL:
-        printf("GLOBAL: %s\n", token.lexeme);
-        break;
-    case TK_PARAMETER:
-        printf("PARAMETER: %s\n", token.lexeme);
-        break;
-    case TK_LIST:
-        printf("LIST: %s\n", token.lexeme);
-        break;
-    case TK_SQL:
-        printf("SQL: %s\n", token.lexeme);
-        break;
-    case TK_SQR:
-        printf("SQR: %s\n", token.lexeme);
-        break;
-    case TK_INPUT:
-        printf("INPUT: %s\n", token.lexeme);
-        break;
-    case TK_OUTPUT:
-        printf("OUTPUT: %s\n", token.lexeme);
-        break;
-    case TK_INT:
-        printf("INT: %s\n", token.lexeme);
-        break;
-    case TK_REAL:
-        printf("REAL: %s\n", token.lexeme);
-        break;
-    case TK_COMMA:
-        printf("COMMA: %s\n", token.lexeme);
-        break;
-    case TK_SEM:
-        printf("SEM: %s\n", token.lexeme);
-        break;
-    case TK_COLON:
-        printf("COLON: %s\n", token.lexeme);
-        break;
-    case TK_DOT:
-        printf("DOT: %s\n", token.lexeme);
-        break;
-    case TK_ENDWHILE:
-        printf("ENDWHILE: %s\n", token.lexeme);
-        break;
-    case TK_OP:
-        printf("OP: %s\n", token.lexeme);
-        break;
-    case TK_CL:
-        printf("CL: %s\n", token.lexeme);
-        break;
-    case TK_IF:
-        printf("IF: %s\n", token.lexeme);
-        break;
-    case TK_THEN:
-        printf("THEN: %s\n", token.lexeme);
-        break;
-    case TK_ENDIF:
-        printf("ENDIF: %s\n", token.lexeme);
-        break;
-    case TK_READ:
-        printf("READ: %s\n", token.lexeme);
-        break;
-    case TK_WRITE:
-        printf("WRITE: %s\n", token.lexeme);
-        break;
-    case TK_RETURN:
-        printf("RETURN: %s\n", token.lexeme);
-        break;
-    case TK_PLUS:
-        printf("PLUS: %s\n", token.lexeme);
-        break;
-    case TK_MINUS:
-        printf("MINUS: %s\n", token.lexeme);
-        break;
-    case TK_MUL:
-        printf("MUL: %s\n", token.lexeme);
-        break;
-    case TK_DIV:
-        printf("DIV: %s\n", token.lexeme);
-        break;
-    case TK_CALL:
-        printf("CALL: %s\n", token.lexeme);
-        break;
-    case TK_RECORD:
-        printf("RECORD: %s\n", token.lexeme);
-        break;
-    case TK_ENDRECORD:
-        printf("ENDRECORD: %s\n", token.lexeme);
-        break;
-    case TK_ELSE:
-        printf("ELSE: %s\n", token.lexeme);
-        break;
-    case TK_AND:
-        printf("AND: %s\n", token.lexeme);
-        break;
-    case TK_OR:
-        printf("OR: %s\n", token.lexeme);
-        break;
-    case TK_NOT:
-        printf("NOT: %s\n", token.lexeme);
-        break;
-    case TK_LT:
-        printf("LT: %s\n", token.lexeme);
-        break;
-    case TK_LE:
-        printf("LE: %s\n", token.lexeme);
-        break;
-    case TK_EQ:
-        printf("EQ: %s\n", token.lexeme);
-        break;
-    case TK_GT:
-        printf("GT: %s\n", token.lexeme);
-        break;
-    case TK_GE:
-        printf("GE: %s\n", token.lexeme);
-        break;
-    case TK_NE:
-        printf("NE: %s\n", token.lexeme);
-        break;
-    case TK_UNKNOWN:
-    default:
-        printf("Unknown: %s\n", token.lexeme);
-        break;
-    }
+    if(c>= 65 && c<= 90)
+    return 1;
+    else if(c>= 97 && c<=122)
+    return 1;
+    else 
+    return 0;
 }
 
-// FILE *getStream(FILE* fp,char* buffer,int bsize)
-// {
-// 	int count;
-// 	if(!feof(fp))
-// 		count=fread(buffer,1,bsize,fp);
-// 	if(count<bsize)
-// 	buffer[count] = '\0';
-// 	return fp;
-// }
-// void removeComments(FILE *fp){
-//     char c = fgetc(fp);
-//     while (c!=EOF)
-//     {
-//         if(c=='%'){
-//             while(c!='\n' && c!=EOF){
-//                 c=fgetc(fp);
-//             }
-//         }
-//         if(c==EOF)
-//         break;
-//         printf("%c",c);
-//         c=fgetc(fp);
-//     }
-//     printf("\n");
-// }
-
-// int main()
-// {
-//     FILE *fp = fopen("t2.txt","r");
-//     int bufsize=5;
-//     char *buffer = (char*)malloc(bufsize);
-//     if(fp==NULL){
-//         printf("error opening file");
-//     }
-//     // while(!feof(fp)){
-// 	// 	memset(buffer, 0, sizeof(buffer));
-//     //     fp = getStream(fp,buffer,bufsize);
-//     //     printf("%s\n",buffer);
-//     // }
-//     removeComments(fp);
-//     fclose(fp);
-//     // printf("hello\n");
-//     return 0;
-// }
-
-
-
-int main() {
-    FILE* fp = fopen("./TestCases/t3.txt", "r");
-    if (!fp) {
-        perror("Error opening file");
-        return -1;
+#define BUFFERSIZE 100
+FILE * fp;
+char DoubleBuffer[2][BUFFERSIZE];
+int p = 1; 
+int merge = 0;
+int Line_No = 1;
+int getStream(FILE *fp)
+{
+    if(fp == NULL)
+    {
+        printf("Error /n");
     }
 
-    char buffer[2][BUFFER_SIZE];
+    if(p==1)
+    {
+        fread(DoubleBuffer[0], sizeof(char), BUFFERSIZE , fp);
+        printf("Buffer 1 filled \n");
+        p = 0;
+    }
+    else 
+    {
+        fread(DoubleBuffer[1], sizeof(char), BUFFERSIZE, fp);
+        printf("Buffer 2 filled \n");
+        p = 1;
+    }
+    
+}
 
-    // uncomment to remove comments
-    // fp = getStream(fp, buffer, BUFFER_SIZE);
-    // removeComments(fp, buffer, BUFFER_SIZE);
+char read(int* end, FILE* fp)
+{
+    if(*end >= BUFFERSIZE)
+    {
+        *end = 0;
+        getStream(fp);
+        merge = 1;
+    }
+    // if(DoubleBuffer[p][*end] == '\n')
+    // Line_No++;
+    return DoubleBuffer[p][(*end)];
 
-    // rewind(fp);
-    fp = getStream(fp, buffer, BUFFER_SIZE);
+}
 
-    Token token;
-    int bufferIndex = 0;
-    do {
-        token = getNextToken(fp, buffer, BUFFER_SIZE, &bufferIndex);
-        printToken(token);
-        } while (token.type != TK_END);
+char* ret_lexeme(int beg, int end)
+{
 
-    fclose(fp);
+if(merge == 0)
+{
+    char* ans = (char*)malloc(sizeof(char)*(end-beg+2));
+    strncpy(ans, DoubleBuffer[p]+beg, end-beg + 1);
+    ans[end-beg+1] = '\0';
+    printf("%s --- %d \n", ans, Line_No);
+    return ans;
+}
+else{
+    printf("second buffer issue %d",beg);
+    char* ans1 = (char*)malloc(sizeof(char)*(BUFFERSIZE-beg));
+    char* ans = (char*)malloc(sizeof(char)*(BUFFERSIZE -beg+end+2));
+    char* ans2 = (char*)malloc(sizeof(char)*(end+2));
+    strncpy(ans1, DoubleBuffer[1-p]+beg, BUFFERSIZE-beg);
+    strncpy(ans2, DoubleBuffer[p], end+ 1);
+    ans2[end+1]='\0';
+    // char* ans = (char*)malloc(sizeof(char)*(BUFFERSIZE -beg+end+2));
+    strncpy(ans,ans1,BUFFERSIZE-beg);
+    strcat(ans,ans2);
+    printf("%s --- %d \n", ans, Line_No);
+    merge=0;
+    printf("buffer issues end");
+    return ans;
+}
+}
+
+void print(FILE* fp)
+{
+    int beg=0;
+    int end=0; 
+    int t = 1;
+    while(t)
+    {
+    beg = end;
+    char inp = read(&end, fp);
+    if(isdigit(inp))
+    {
+        inp = '1';
+    }
+    else if(isAlpha(inp))
+    {
+        if(inp == 'b' || inp == 'c' || inp == 'd')
+            inp = '2';
+        else 
+            inp = '3';
+    }
+    switch (inp)
+    {
+    case '!':
+        end++;
+        if(read(&end,fp) == '=')
+        {
+            printf("TK_NE "); 
+            ret_lexeme(beg,end);
+            end++;
+        }
+        else 
+        printf("error \n");
+        break;
+    case '=':
+        end++;
+        if(read(&end,fp) == '=')
+        {printf("TK_EQ "); ret_lexeme(beg,end); end++;}
+        else 
+        printf("error \n");
+        break;
+    case '>':
+        end++;
+        if(read(&end,fp) == '=')
+        {printf("TK_GE "); ret_lexeme(beg,end); end++;}
+        else 
+        printf("error \n");
+        break;
+    case '@':
+        end++;
+        if(read(&end,fp) == '@')
+        {
+            end++;
+            if(read(&end,fp) == '@')
+            {
+                printf("TK_OR ");     
+                ret_lexeme(beg,end);
+                end++;
+                
+            }
+            else
+            printf("error \n");
+        }
+        else 
+        printf("error \n");
+    break;
+
+    case '&':
+        end++;
+        if(read(&end,fp) == '&')
+        {
+            end++;
+            if(read(&end,fp) == '&')
+            {
+                printf("TK_AND ");ret_lexeme(beg,end);
+                end++;
+                
+            }
+            else
+            printf("error \n");
+        }
+        else 
+        printf("error \n");
+    break;
+    
+    case '*':
+        printf("TK_MUL ");
+        ret_lexeme(beg,end);
+        end++;
+    break;
+
+    case '+':
+        printf("TK_PLUS ");
+        ret_lexeme(beg,end);
+        end++;
+    break;
+
+    case '~':
+        printf("TK_NOT ");
+        ret_lexeme(beg,end);
+        end++;
+    break;
+
+    case '/':
+        printf("TK_DIV ");
+        ret_lexeme(beg,end);
+        end++;
+    break;
+
+    case '.':
+        printf("TK_DOT ");
+        ret_lexeme(beg,end);
+        end++;
+    break;
+
+    case '-':
+        printf("TK_MINUS ");
+        ret_lexeme(beg,end);
+        end++;
+    break;
+
+    case ':':
+        printf("TK_COLON ");
+        ret_lexeme(beg,end);
+        end++;
+
+    break;
+
+    case ';':
+        printf("TK_SEM ");
+        ret_lexeme(beg,end);
+        end++;
+    break;
+
+    case ',':
+        printf("TK_COMMA ");
+        ret_lexeme(beg,end);
+        end++;
+    break;
+
+    case ')':
+        printf("TK_CL ");
+        ret_lexeme(beg,end);
+        end++;
+    break;
+
+    case '(':
+        printf("TK_OP ");
+        ret_lexeme(beg,end);
+        end++;
+    break;
+
+    case ']':
+        printf("TK_SQR ");
+        ret_lexeme(beg,end);
+        end++;
+    break;
+
+    case '[':
+        printf("TK_SQL ");
+        ret_lexeme(beg,end);
+        end++;
+    break;
+
+    case '%':
+        printf("TK_COMMENT ");
+        while(read(&end, fp) != '\n')
+        end++;
+        ret_lexeme(beg,end-1);
+        
+    break;
+
+    case '#':
+        end++;
+        if(isAlpha(read(&end,fp)))
+        {
+            end++;
+            while(isAlpha(read(&end,fp)))
+                end++;
+            printf("TK_RUID ");
+            ret_lexeme(beg,end - 1);
+        }
+        else 
+        printf("error \n");
+    break;
+
+    case '<':
+        end++;
+        if(read(&end,fp) == '=')
+        {
+            end++;
+            printf("TK_LE ");
+            ret_lexeme(beg,end-1);
+        }
+        else if(read(&end,fp) == '-')
+        {
+            end++;
+            if(read(&end,fp) == '-')
+            {
+                end++;
+                if(read(&end,fp) == '-')
+                {
+                    printf("TK_ASSIGNOP ");
+                    ret_lexeme(beg,end);
+                    end++;
+                }
+                else 
+                {
+                    printf("error \n");
+                }
+            }
+            else 
+            {
+                printf("error \n");
+            }
+        }
+        else 
+        {
+            printf("TK_LT ");
+            ret_lexeme(beg,end-1);
+        }
+    break;
+
+    case '_':
+        end++;
+        if(isAlpha(read(&end,fp)))
+        {
+            end++;
+            while(isAlpha(read(&end,fp)))
+                end++;
+            while(isdigit(read(&end,fp)))
+                end++;
+            printf("TK_FUNID ");
+            ret_lexeme(beg,end-1);
+        }
+        else 
+        printf("error \n");
+    break;
+
+    case '1' :
+    end++;
+    while(isdigit(read(&end,fp)))
+    end++;
+    if(read(&end,fp) == '.')
+    {
+        end++;
+        if(isdigit(read(&end,fp)))
+        {
+            end++;
+            if(isdigit(read(&end,fp)))
+            {
+                end++;
+                if(read(&end,fp) == 'E')
+                {
+                    end++;
+                    if(read(&end,fp) == '+' || read(&end,fp) == '-')
+                    {
+                         end++;
+                         if(isdigit(read(&end,fp)))
+                            {
+                                end++;
+                                if(isdigit(read(&end,fp)))
+                                {
+                                    printf("TK_RNUM ");
+                                    ret_lexeme(beg,end);
+                                    end++;
+                                }
+                                else 
+                                {
+                                    printf("error \n");
+                                }
+                            }
+
+                    }
+                    else if(isdigit(read(&end,fp)))
+                    {
+                        end++;
+                        if(isdigit(read(&end,fp)))
+                        {
+                            printf("TK_RNUM ");
+                            ret_lexeme(beg,end);
+                            end++;
+                        }
+                        else 
+                        {
+                            printf("error \n");
+                        }
+                    }
+                    else 
+                    {
+                        printf("error \n");
+                    }
+                }
+                else 
+                {
+                    printf("TK_RNUM ");
+                    ret_lexeme(beg,end-1);
+                }
+            }
+            else 
+            {
+                printf("error \n");
+            }
+        }
+        else 
+        printf("error \n");
+
+    }
+    else 
+    {
+        printf("TK_NUM ");
+        ret_lexeme(beg,end-1);
+    }
+
+    break;
+
+    case '2':
+    end++;
+     char c = read(&end,fp);
+    //  printf("%c",c);
+    if(isAlpha(c))
+    {
+        end++;
+        // printf("here");
+        while(isAlpha(read(&end,fp)))
+            end++;
+        ret_lexeme(beg,end-1);
+        printf("LOOKUP ");
+    }
+    else if( read(&end,fp) <= 55 && read(&end,fp) >=50)
+    {
+        // printf("lalu");
+        end++;
+        while( read(&end,fp) <= 100 && read(&end,fp) >= 98)
+            end++;
+        if(read(&end,fp) <= 55 && read(&end,fp) >=50)
+        {
+            end++;
+            while(read(&end,fp) <= 55 && read(&end,fp) >=50)
+                end++;
+            printf("TK_ID ");
+            ret_lexeme(beg,end-1);
+        }
+        else 
+        {
+            printf("TK_ID ");
+            ret_lexeme(beg,end-1);
+        }
+    }
+    break;
+
+    case '3':
+    end++;
+    if(isalpha(read(&end,fp)))
+    {
+        // printf("yahan ");
+        end++;
+        while(isalpha(read(&end,fp)))
+            end++;
+        printf("LOOKUP ");
+        ret_lexeme(beg,end-1);
+    }  
+    break;
+    
+    case '\n':
+    Line_No++;
+    end++;
+    break;
+
+    case ' ':
+    end++;
+    break;
+
+    default:
+        t=0;
+        break;
+    }
+    }
+
+}
+
+int main()
+{
+    fp = fopen("text.txt", "r");
+    getStream(fp);
+    // printf("%s", DoubleBuffer[0]);
+    print(fp);
     return 0;
 }
