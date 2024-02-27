@@ -3,6 +3,15 @@
 #include<stdlib.h>
 #include<string.h>
 
+void concatenate_string(char* s,int j, char* s1)
+{
+    int i;
+    for (i = 0; s1[i] != '\0'; i++) {
+        s[i + j] = s1[i];
+    }
+    s[i + j] = '\0';
+    return;
+}
 
 int isAlpha(char c)
 {
@@ -58,7 +67,7 @@ char read(int* end, FILE* fp)
 
 char* ret_lexeme(int beg, int end)
 {
-
+if(merge==1 && beg<=end) merge=0;
 if(merge == 0)
 {
     char* ans = (char*)malloc(sizeof(char)*(end-beg+2));
@@ -68,19 +77,20 @@ if(merge == 0)
     return ans;
 }
 else{
-    printf("second buffer issue %d",beg);
-    char* ans1 = (char*)malloc(sizeof(char)*(BUFFERSIZE-beg));
+    // printf("issue %d && %d",beg,end);
+    char* ans1 = (char*)malloc(sizeof(char)*(BUFFERSIZE-beg+1));
     char* ans = (char*)malloc(sizeof(char)*(BUFFERSIZE -beg+end+2));
     char* ans2 = (char*)malloc(sizeof(char)*(end+2));
     strncpy(ans1, DoubleBuffer[1-p]+beg, BUFFERSIZE-beg);
-    strncpy(ans2, DoubleBuffer[p], end+ 1);
+    strncpy(ans2, DoubleBuffer[p], end+1);
     ans2[end+1]='\0';
+    ans1[BUFFERSIZE-beg]='\0';
     // char* ans = (char*)malloc(sizeof(char)*(BUFFERSIZE -beg+end+2));
     strncpy(ans,ans1,BUFFERSIZE-beg);
-    strcat(ans,ans2);
+    concatenate_string(ans,BUFFERSIZE-beg,ans2);
     printf("%s --- %d \n", ans, Line_No);
     merge=0;
-    printf("buffer issues end");
+    // printf("buffer issues end");
     return ans;
 }
 }
@@ -454,6 +464,14 @@ void print(FILE* fp)
     break;
 
     case ' ':
+    end++;
+    break;
+
+    // case '$':
+    // end++;
+    // break;
+
+    case '|':
     end++;
     break;
 
