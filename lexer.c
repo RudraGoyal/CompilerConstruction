@@ -27,6 +27,8 @@ int isAlpha(char c)
 FILE * fp;
 char DoubleBuffer[2][BUFFERSIZE];
 int p = 1; 
+int preend=-1;
+int readSize;
 int merge = 0;
 int Line_No = 1;
 int getStream(FILE *fp)
@@ -34,18 +36,18 @@ int getStream(FILE *fp)
     if(fp == NULL)
     {
         printf("Error /n");
+        
     }
-
     if(p==1)
     {
-        fread(DoubleBuffer[0], sizeof(char), BUFFERSIZE , fp);
-        printf("Buffer 1 filled \n");
+       readSize=fread(DoubleBuffer[0], sizeof(char), BUFFERSIZE , fp);
+        // printf("Buffer 1 filled \n");
         p = 0;
     }
     else 
     {
-        fread(DoubleBuffer[1], sizeof(char), BUFFERSIZE, fp);
-        printf("Buffer 2 filled \n");
+        readSize=fread(DoubleBuffer[1], sizeof(char), BUFFERSIZE, fp);
+        // printf("Buffer 2 filled \n");
         p = 1;
     }
     
@@ -53,21 +55,74 @@ int getStream(FILE *fp)
 
 char read(int* end, FILE* fp)
 {
+    if(readSize<=1){ 
+        readSize--;
+        return '$';
+    }
+    
+    if(readSize < BUFFERSIZE)
+    {
+        // readSize--;
+        if(preend == -1){
+            preend = *end;
+            readSize--;
+        }
+        if(preend != *end){
+            readSize--;
+            preend= *end; 
+        }
+    }
     if(*end >= BUFFERSIZE)
     {
         *end = 0;
         getStream(fp);
         merge = 1;
     }
+    
     // if(DoubleBuffer[p][*end] == '\n')
     // Line_No++;
+    // printf(" {%d , %c} \n",readSize, DoubleBuffer[p][(*end)]);
     return DoubleBuffer[p][(*end)];
 
 }
 
+char* ret_lexeme_error(int beg, int end)
+{
+if(merge==1 && beg<=end) merge=0;
+ if(Line_No>14) exit(0);
+if(merge == 0)
+{
+    char* ans = (char*)malloc(sizeof(char)*(end-beg+2));
+    strncpy(ans, DoubleBuffer[p]+beg, end-beg + 1);
+    ans[end-beg+1] = '\0';
+    //printf("%s --- %d \n", ans, Line_No);
+    return ans;
+}
+else{
+    // printf("issue %d && %d",beg,end);
+    char* ans1 = (char*)malloc(sizeof(char)*(BUFFERSIZE-beg+1));
+    char* ans = (char*)malloc(sizeof(char)*(BUFFERSIZE -beg+end+2));
+    char* ans2 = (char*)malloc(sizeof(char)*(end+2));
+    strncpy(ans1, DoubleBuffer[1-p]+beg, BUFFERSIZE-beg);
+    strncpy(ans2, DoubleBuffer[p], end+1);
+    ans2[end+1]='\0';
+    ans1[BUFFERSIZE-beg]='\0';
+    // char* ans = (char*)malloc(sizeof(char)*(BUFFERSIZE -beg+end+2));
+    strncpy(ans,ans1,BUFFERSIZE-beg);
+    concatenate_string(ans,BUFFERSIZE-beg,ans2);
+    // printf("%s --- %d \n", ans, Line_No);
+    merge=0;
+    // printf("buffer issues end");
+    return ans;
+}
+}
+
+
+
 char* ret_lexeme(int beg, int end)
 {
 if(merge==1 && beg<=end) merge=0;
+ if(Line_No>14) exit(0);
 if(merge == 0)
 {
     char* ans = (char*)malloc(sizeof(char)*(end-beg+2));
@@ -100,8 +155,10 @@ void print(FILE* fp)
     int beg=0;
     int end=0; 
     int t = 1;
+    
     while(t)
     {
+    // if(end>=BUFFERSIZE) end=0
     beg = end;
     char inp = read(&end, fp);
     if(isdigit(inp))
@@ -126,21 +183,22 @@ void print(FILE* fp)
             end++;
         }
         else 
-        printf("error \n");
+        printf("error  unrecognized pattern <%s> --- %d\n", ret_lexeme_error(beg,end-1), Line_No);
+        
         break;
     case '=':
         end++;
         if(read(&end,fp) == '=')
         {printf("TK_EQ "); ret_lexeme(beg,end); end++;}
         else 
-        printf("error \n");
+        printf("error  unrecognized pattern <%s> --- %d\n", ret_lexeme_error(beg,end-1), Line_No);
         break;
     case '>':
         end++;
         if(read(&end,fp) == '=')
         {printf("TK_GE "); ret_lexeme(beg,end); end++;}
         else 
-        printf("error \n");
+        printf("error  unrecognized pattern <%s> --- %d\n", ret_lexeme_error(beg,end-1), Line_No);
         break;
     case '@':
         end++;
@@ -155,10 +213,10 @@ void print(FILE* fp)
                 
             }
             else
-            printf("error \n");
+            printf("error  unrecognized pattern <%s> --- %d\n", ret_lexeme_error(beg,end-1), Line_No);
         }
         else 
-        printf("error \n");
+        printf("error  unrecognized pattern <%s> --- %d\n", ret_lexeme_error(beg,end-1), Line_No);
     break;
 
     case '&':
@@ -173,10 +231,10 @@ void print(FILE* fp)
                 
             }
             else
-            printf("error \n");
+            printf("error  unrecognized pattern <%s> --- %d\n", ret_lexeme_error(beg,end-1), Line_No);
         }
         else 
-        printf("error \n");
+        printf("error  unrecognized pattern <%s> --- %d\n", ret_lexeme_error(beg,end-1), Line_No);
     break;
     
     case '*':
@@ -277,7 +335,7 @@ void print(FILE* fp)
             ret_lexeme(beg,end - 1);
         }
         else 
-        printf("error \n");
+        printf("error  unrecognized pattern <%s> --- %d\n", ret_lexeme_error(beg,end-1), Line_No);
     break;
 
     case '<':
@@ -302,12 +360,12 @@ void print(FILE* fp)
                 }
                 else 
                 {
-                    printf("error \n");
+                    printf("error  unrecognized pattern <%s> --- %d\n", ret_lexeme_error(beg,end-1), Line_No);
                 }
             }
             else 
             {
-                printf("error \n");
+                printf("error  unrecognized pattern <%s> --- %d\n", ret_lexeme_error(beg,end-1), Line_No);
             }
         }
         else 
@@ -326,11 +384,14 @@ void print(FILE* fp)
                 end++;
             while(isdigit(read(&end,fp)))
                 end++;
-            printf("TK_FUNID ");
-            ret_lexeme(beg,end-1);
+            if(strlen(ret_lexeme_error(beg,end-1))>30) printf("Error: The length of function id lexeme given is greater than 30 --- %d\n",Line_No);
+            else {
+                printf("TK_FUNID ");
+                ret_lexeme(beg,end-1);
+            }
         }
         else 
-        printf("error \n");
+        printf("error  unrecognized pattern <%s> --- %d\n", ret_lexeme_error(beg,end-1), Line_No);
     break;
 
     case '1' :
@@ -363,7 +424,7 @@ void print(FILE* fp)
                                 }
                                 else 
                                 {
-                                    printf("error \n");
+                                    printf("error  unrecognized pattern <%s> --- %d\n", ret_lexeme_error(beg,end-1), Line_No);
                                 }
                             }
 
@@ -379,12 +440,12 @@ void print(FILE* fp)
                         }
                         else 
                         {
-                            printf("error \n");
+                            printf("error  unrecognized pattern <%s> --- %d\n", ret_lexeme_error(beg,end-1), Line_No);
                         }
                     }
                     else 
                     {
-                        printf("error \n");
+                        printf("error  unrecognized pattern <%s> --- %d\n", ret_lexeme_error(beg,end-1), Line_No);
                     }
                 }
                 else 
@@ -395,11 +456,11 @@ void print(FILE* fp)
             }
             else 
             {
-                printf("error \n");
+                printf("error  unrecognized pattern <%s> --- %d\n", ret_lexeme_error(beg,end-1), Line_No);
             }
         }
         else 
-        printf("error \n");
+        printf("error  unrecognized pattern <%s> --- %d\n", ret_lexeme_error(beg,end-1), Line_No);
 
     }
     else 
@@ -420,8 +481,12 @@ void print(FILE* fp)
         // printf("here");
         while(isAlpha(read(&end,fp)))
             end++;
-        ret_lexeme(beg,end-1);
-        printf("LOOKUP ");
+        // if(strlen(ret_lexeme_error(beg,end-1))>20) printf("Error: The length of variable id lexeme given is greater than 20\n");
+        // else 
+        // {
+            printf("LOOKUP ");
+            ret_lexeme(beg,end-1);
+        // }
     }
     else if( read(&end,fp) <= 55 && read(&end,fp) >=50)
     {
@@ -434,13 +499,18 @@ void print(FILE* fp)
             end++;
             while(read(&end,fp) <= 55 && read(&end,fp) >=50)
                 end++;
-            printf("TK_ID ");
-            ret_lexeme(beg,end-1);
+            if(strlen(ret_lexeme_error(beg,end-1))>20) printf("Error: The length of variable id lexeme given is greater than 20\n");
+            else{ 
+                printf("TK_ID ");
+                ret_lexeme(beg,end-1);
+            }
         }
         else 
-        {
-            printf("TK_ID ");
-            ret_lexeme(beg,end-1);
+        {   if(strlen(ret_lexeme_error(beg,end-1))>20) printf("Error: The length of variable id lexeme given is greater than 20\n");
+            else{
+                printf("TK_ID ");
+                ret_lexeme(beg,end-1);
+            }
         }
     }
     break;
@@ -453,8 +523,9 @@ void print(FILE* fp)
         end++;
         while(isalpha(read(&end,fp)))
             end++;
-        printf("LOOKUP ");
-        ret_lexeme(beg,end-1);
+        // if(strlen(ret_lexeme_error(beg,end-1))>20) printf("Error:   The length of variable id lexeme given is greater than 20\n");
+            printf("LOOKUP ");
+            ret_lexeme(beg,end-1);
     }  
     break;
     
@@ -467,16 +538,21 @@ void print(FILE* fp)
     end++;
     break;
 
-    // case '$':
-    // end++;
-    // break;
-
-    case '|':
+    case '$':
+    if(readSize<=0) 
+    t=0;
+    else printf("Error Unrecognized Symbol <$> --- %d\n",Line_No);
     end++;
     break;
 
+    // case '|':
+    // end++;
+    // break;
+
     default:
-        t=0;
+        printf("Error Unrecognized Symbol <%s> --- %d \n", ret_lexeme_error(beg,end), Line_No);
+        // ret_lexeme(beg,end);
+        end++;
         break;
     }
     }
