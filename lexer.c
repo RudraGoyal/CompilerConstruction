@@ -2,6 +2,7 @@
 #include<ctype.h>
 #include<stdlib.h>
 #include<string.h>
+#include "lexer.h"
 
 void concatenate_string(char* s,int j, char* s1)
 {
