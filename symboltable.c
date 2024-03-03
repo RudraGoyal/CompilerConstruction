@@ -18,12 +18,14 @@ typedef struct symbolTable symTable;
 
 bucketNode* initbucketNode(char*key, char*val){
     bucketNode*node=(bucketNode*)malloc(sizeof(bucketNode));
-    node->key=key;
+    node->key=(char*)malloc(strlen(key));
+    strcpy(node->key,key);
+    // node->key=key;
     node->val=val;
     node->next=NULL;
     return node;
 }
-int Jenkins_one_at_a_time_hashing_function(const char *str)
+int hashing_function(const char *str)
 {
     int hash, i;
     for (hash = i = 0; str[i] != '\0'; i++)
@@ -37,9 +39,9 @@ int Jenkins_one_at_a_time_hashing_function(const char *str)
     hash += (hash << 15);
     return (abs(hash)%TSIZE);
 }
-char* lookup(char* key, symTable* map){
+char* lookupST(char* key, symTable* map){
     // returns NULL if not found else returns the token
-    int index=Jenkins_one_at_a_time_hashing_function(key);
+    int index=hashing_function(key);
     bucketNode*head= map->table[index];
     while(head!=NULL){
         if(strcmp(head->key, key)==0){
@@ -50,10 +52,10 @@ char* lookup(char* key, symTable* map){
     return NULL;
 }
 
-void insert(char* key, char* val, symTable*map){
-    int index=Jenkins_one_at_a_time_hashing_function(key);
+void insertST(char* key, char* val, symTable*map){
+    int index=hashing_function(key);
     bucketNode*node= initbucketNode(key, val);
-    if(lookup(key,map)!=NULL) return;
+    if(lookupST(key,map)!=NULL) return;
     if(map->table[index]==NULL){
         map->table[index]=node;
     }
@@ -71,73 +73,73 @@ symTable* initsymbolTable(){
     for(int i=0;i<TSIZE;i++){
         map->table[i]=NULL;
     }
-    insert("<---", "TK_ASSIGNOP", map);
-    insert("%%", "TK_COMMENT", map);
-    insert("with", "TK_WITH", map);
-    insert("parameters", "TK_PARAMETERS", map);
-    insert("end", "TK_END", map);
-    insert("while", "TK_WHILE", map);
-    insert("union", "TK_UNION", map);
-    insert("endunion", "TK_ENDUNION", map);
-    insert("definetype", "TK_DEFINETYPE", map);
-    insert("as", "TK_AS", map);
-    insert("type", "TK_TYPE", map);
-    insert("_main", "TK_MAIN", map);
-    insert("global", "TK_GLOBAL", map);
-    insert("parameter", "TK_PARAMETER", map);
-    insert("list", "TK_LIST", map);
-    insert("[", "TK_SQL", map);
-    insert("]", "TK_SQR", map);
-    insert("input", "TK_INPUT", map);
-    insert("output", "TK_OUTPUT", map);
-    insert("int", "TK_INT", map);
-    insert("real", "TK_REAL", map);
-    insert(",", "TK_COMMA", map);
-    insert(";", "TK_SEM", map);
-    insert(":", "TK_COLON", map);
-    insert(".", "TK_DOT", map);
-    insert("endwhile", "TK_ENDWHILE", map);
-    insert("(", "TK_OP", map);
-    insert(")", "TK_CL", map);
-    insert("if", "TK_IF", map);
-    insert("then", "TK_THEN", map);
-    insert("endif", "TK_ENDIF", map);
-    insert("read", "TK_READ", map);
-    insert("write", "TK_WRITE", map);
-    insert("return", "TK_RETURN", map);
-    insert("+", "TK_PLUS", map);
-    insert("-", "TK_MINUS", map);
-    insert("*", "TK_MUL", map);
-    insert("/", "TK_DIV", map);
-    insert("call", "TK_CALL", map);
-    insert("record", "TK_RECORD", map);
-    insert("endrecord", "TK_ENDRECORD", map);
-    insert("else", "TK_ELSE", map);
-    insert("&&&", "TK_AND", map);
-    insert("@@@", "TK_OR", map);
-    insert("~", "TK_NOT", map);
-    insert("<", "TK_LT", map);
-    insert("<=", "TK_LE", map);
-    insert("==", "TK_EQ", map);
-    insert(">", "TK_GT", map);
-    insert(">=", "TK_GE", map);
-    insert("!=", "TK_NE", map);
+    insertST("<---", "TK_ASSIGNOP", map);
+    insertST("%%", "TK_COMMENT", map);
+    insertST("with", "TK_WITH", map);
+    insertST("parameters", "TK_PARAMETERS", map);
+    insertST("end", "TK_END", map);
+    insertST("while", "TK_WHILE", map);
+    insertST("union", "TK_UNION", map);
+    insertST("endunion", "TK_ENDUNION", map);
+    insertST("definetype", "TK_DEFINETYPE", map);
+    insertST("as", "TK_AS", map);
+    insertST("type", "TK_TYPE", map);
+    insertST("_main", "TK_MAIN", map);
+    insertST("global", "TK_GLOBAL", map);
+    insertST("parameter", "TK_PARAMETER", map);
+    insertST("list", "TK_LIST", map);
+    insertST("[", "TK_SQL", map);
+    insertST("]", "TK_SQR", map);
+    insertST("input", "TK_INPUT", map);
+    insertST("output", "TK_OUTPUT", map);
+    insertST("int", "TK_INT", map);
+    insertST("real", "TK_REAL", map);
+    insertST(",", "TK_COMMA", map);
+    insertST(";", "TK_SEM", map);
+    insertST(":", "TK_COLON", map);
+    insertST(".", "TK_DOT", map);
+    insertST("endwhile", "TK_ENDWHILE", map);
+    insertST("(", "TK_OP", map);
+    insertST(")", "TK_CL", map);
+    insertST("if", "TK_IF", map);
+    insertST("then", "TK_THEN", map);
+    insertST("endif", "TK_ENDIF", map);
+    insertST("read", "TK_READ", map);
+    insertST("write", "TK_WRITE", map);
+    insertST("return", "TK_RETURN", map);
+    insertST("+", "TK_PLUS", map);
+    insertST("-", "TK_MINUS", map);
+    insertST("*", "TK_MUL", map);
+    insertST("/", "TK_DIV", map);
+    insertST("call", "TK_CALL", map);
+    insertST("record", "TK_RECORD", map);
+    insertST("endrecord", "TK_ENDRECORD", map);
+    insertST("else", "TK_ELSE", map);
+    insertST("&&&", "TK_AND", map);
+    insertST("@@@", "TK_OR", map);
+    insertST("~", "TK_NOT", map);
+    insertST("<", "TK_LT", map);
+    insertST("<=", "TK_LE", map);
+    insertST("==", "TK_EQ", map);
+    insertST(">", "TK_GT", map);
+    insertST(">=", "TK_GE", map);
+    insertST("!=", "TK_NE", map);
 
     return map;
 }
-int main()
-{	
-	symTable*symT= initsymbolTable();
-    // insert("<---","TK_ASSIGNOP",symT);
-    // insert(";","TK_SEM",symT);
-    printf("%s\n",lookup(";",symT));
-    printf("%s\n",lookup("hdjlashfldkja",symT));
-    printf("%s\n",lookup("end",symT));
+// int main()
+// {	
+// 	symTable*symT= initsymbolTable();
+//     // insertST("<---","TK_ASSIGNOP",symT);
+//     // insertST(";","TK_SEM",symT);
+//     printf("%s\n",lookupST(";",symT));
+//     printf("%s\n",lookupST("hdjlashfldkja",symT));
+//     printf("%s\n",lookupST("end",symT));
 
 
 
-	return 0;
-}
+// 	return 0;
+// }
 
 
 

@@ -2,23 +2,25 @@
 #include<string.h>
 #include<stdlib.h>
 #define TSIZE 1000
-struct bucketNode{
+struct hashNode{
     char*key;
     int val;
-    struct bucketNode*next;
+    struct hashNode*next;
 };
-struct symbolTable{
+struct hashTable{
     int currSize;
     int totalSize;
-    struct bucketNode* table[TSIZE];
+    struct hashNode* table[TSIZE];
 };
-typedef struct bucketNode bucketNode;
-typedef struct symbolTable hashmap;
+typedef struct hashNode hashNode;
+typedef struct hashTable hashmap;
 
 
-bucketNode* initbucketNode(char*key, int val){
-    bucketNode*node=(bucketNode*)malloc(sizeof(bucketNode));
-    node->key=key;
+hashNode* inithashNode(char*key, int val){
+    hashNode*node=(hashNode*)malloc(sizeof(hashNode));
+    node->key=(char*)malloc(strlen(key));
+    strcpy(node->key,key);
+    // node->key=key;
     node->val=val;
     node->next=NULL;
     return node;
@@ -40,7 +42,7 @@ int Jenkins_one_at_a_time_hashing_function(const char *str)
 int lookup(char* key, hashmap* map){
     // returns NULL if not found else returns the token
     int index=Jenkins_one_at_a_time_hashing_function(key);
-    bucketNode*head= map->table[index];
+    hashNode*head= map->table[index];
     while(head!=NULL){
         if(strcmp(head->key, key)==0){
             return head->val;
@@ -52,7 +54,7 @@ int lookup(char* key, hashmap* map){
 
 void insert(char* key, int val, hashmap*map){
     int index=Jenkins_one_at_a_time_hashing_function(key);
-    bucketNode*node= initbucketNode(key, val);
+    hashNode*node= inithashNode(key, val);
     if(lookup(key,map)!=-1) return;
     if(map->table[index]==NULL){
         map->table[index]=node;
@@ -76,7 +78,7 @@ hashmap* inithashmap(){
 }
 // int main()
 // {	
-// 	hashmap*symT= initsymbolTable();
+// 	hashmap*symT= inithashTable();
 //     insert("<---",2,symT);
 //     insert(";",5,symT);
 //     printf("%d\n",lookup("<---",symT));
