@@ -561,6 +561,24 @@ void print(FILE* fp)
 
 }
 
+void removeComments(FILE *fp){
+    char c = fgetc(fp);
+    while (c!=EOF)
+    {
+        if(c=='%'){
+            while(c!='\n' && c!=EOF){
+                c=fgetc(fp);
+            }
+        }
+        if(c==EOF)
+        break;
+        printf("%c",c);
+        c=fgetc(fp);
+    }
+    printf("\n");
+    rewind(fp);
+}
+
 // int main()
 // {
 //     fp = fopen("text.txt", "r");

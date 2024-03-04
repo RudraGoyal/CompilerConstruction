@@ -57,7 +57,8 @@ void add_lex(lex_header* head,lexeme* l);
 // Utilities
 void concatenate_string(char* s,int j, char* s1);
 int isAlpha(char c);
-void print(FILE* fp);
-
+// void print(FILE* fp);
+void print(FILE* fp,symTable* map,lex_header* lex_list);
+void removeComments(FILE* fp);
 
 #endif

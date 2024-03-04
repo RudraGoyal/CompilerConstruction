@@ -24,12 +24,14 @@ void print_intro(){
 	printf("\n");
 }
 
-void print_token_list(FILE* fp){
+void print_token_list(FILE* fp,symTable* map,lex_header* lex_list){
 	getStream(fp);
-	print(fp);
+	print(fp,map,lex_list);
 }
 
 int main(){
+	symTable* map = initsymbolTable();
+	lex_header* lex_list = create_Larray();
 	int option;
 	FILE* fp;
 	fp = fopen("TestCases/t2.txt","r");
@@ -42,10 +44,11 @@ int main(){
 			break;
 			case 1:
 			printf("1\n");
+			removeComments(fp);
 			break;
 			case 2:
 			printf("2\n");
-			print_token_list(fp);
+			print_token_list(fp,map,lex_list);
 			break;
 			case 3:
 			printf("3\n");
@@ -56,6 +59,7 @@ int main(){
 			default:
 			printf("Please choose a Valid Option\n");
 		}
+		rewind(fp);
 		if(option==0){
 			printf("-------Exiting-------\n");
 			break;
