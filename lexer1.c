@@ -735,23 +735,20 @@ void print(FILE* fp,symTable* map,lex_header* lex_list)
 }
 
 void removeComments(FILE *fp){
-  int beg=0;
-  int end=0; 
-  char inp = read(&end, fp);
-  while (inp!=EOF)
-  {
-      if(inp=='%'){
-          while(inp!='\n' && inp!=EOF){
-              inp=read(&end, fp);;
-          }
-      }
-      if(inp==EOF)
-      break;
-      printf("%c",inp);
-      inp=read(&end, fp);;
-  }
-  printf("\n");
-  rewind(fp);
+    char c = fgetc(fp);
+    while (c!=EOF)
+    {
+        if(c=='%'){
+            while(c!='\n' && c!=EOF){
+                c=fgetc(fp);
+            }
+        }
+        if(c==EOF)
+        break;
+        printf("%c",c);
+        c=fgetc(fp);
+    }
+    printf("\n");
 }
 
 // int main()
