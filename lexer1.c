@@ -290,7 +290,7 @@ void print(FILE *fp, symTable *map, lex_header *lex_list)
                 printf("error  unrecognized pattern <%s> --- %d\n", ret_lexeme_error(beg, end - 1), Line_No);
             break;
 
-        case '*':
+        case '*':;
             char *u = "TK_MUL";
             printf("TK_MUL ");
             char *string = ret_lexeme(beg, end);
@@ -757,7 +757,9 @@ void print(FILE *fp, symTable *map, lex_header *lex_list)
             // case '|':
             // end++;
             // break;
-
+        case '\t':
+          end++;
+          break;
         default:
             printf("Error Unrecognized Symbol <%s> --- %d \n", ret_lexeme_error(beg, end), Line_No);
             // ret_lexeme(beg,end);
