@@ -1,17 +1,16 @@
 #include <stdio.h>
-#include<string.h>
-#include<stdlib.h>
+#include <string.h>
+#include <stdlib.h>
 #include "lexer.h"
 
-
-
-bucketNode* initbucketNode(char*key, char*val){
-    bucketNode*node=(bucketNode*)malloc(sizeof(bucketNode));
-    node->key=(char*)malloc(strlen(key));
-    strcpy(node->key,key);
+bucketNode *initbucketNode(char *key, char *val)
+{
+    bucketNode *node = (bucketNode *)malloc(sizeof(bucketNode));
+    node->key = (char *)malloc(strlen(key));
+    strcpy(node->key, key);
     // node->key=key;
-    node->val=val;
-    node->next=NULL;
+    node->val = val;
+    node->next = NULL;
     return node;
 }
 int hashing_function(const char *str)
@@ -26,41 +25,50 @@ int hashing_function(const char *str)
     hash += (hash << 3);
     hash ^= (hash >> 11);
     hash += (hash << 15);
-    return (abs(hash)%TSIZE);
+    return (abs(hash) % TSIZE);
 }
-char* lookupST(char* key, symTable* map){
+char *lookupST(char *key, symTable *map)
+{
     // returns NULL if not found else returns the token
-    int index=hashing_function(key);
-    bucketNode*head= map->table[index];
-    while(head!=NULL){
-        if(strcmp(head->key, key)==0){
+    int index = hashing_function(key);
+    bucketNode *head = map->table[index];
+    while (head != NULL)
+    {
+        if (strcmp(head->key, key) == 0)
+        {
             return head->val;
         }
-        head=head->next;
+        head = head->next;
     }
     return NULL;
 }
 
-void insertST(char* key, char* val, symTable*map){
-    int index=hashing_function(key);
-    bucketNode*node= initbucketNode(key, val);
-    if(lookupST(key,map)!=NULL) return;
-    if(map->table[index]==NULL){
-        map->table[index]=node;
+void insertST(char *key, char *val, symTable *map)
+{
+    int index = hashing_function(key);
+    bucketNode *node = initbucketNode(key, val);
+    if (lookupST(key, map) != NULL)
+        return;
+    if (map->table[index] == NULL)
+    {
+        map->table[index] = node;
     }
-    else{
-        node->next=map->table[index];
-        map->table[index]=node;
+    else
+    {
+        node->next = map->table[index];
+        map->table[index] = node;
     }
     map->currSize++;
 }
 
-symTable* initsymbolTable(){
-    symTable* map=(symTable*)malloc(sizeof(symTable));
-    map->currSize=0;
-    map->totalSize=TSIZE;
-    for(int i=0;i<TSIZE;i++){
-        map->table[i]=NULL;
+symTable *initsymbolTable()
+{
+    symTable *map = (symTable *)malloc(sizeof(symTable));
+    map->currSize = 0;
+    map->totalSize = TSIZE;
+    for (int i = 0; i < TSIZE; i++)
+    {
+        map->table[i] = NULL;
     }
     insertST("<---", "TK_ASSIGNOP", map);
     insertST("%%", "TK_COMMENT", map);
@@ -117,7 +125,7 @@ symTable* initsymbolTable(){
     return map;
 }
 // int main()
-// {	
+// {
 // 	symTable*symT= initsymbolTable();
 //     // insertST("<---","TK_ASSIGNOP",symT);
 //     // insertST(";","TK_SEM",symT);
@@ -125,10 +133,5 @@ symTable* initsymbolTable(){
 //     printf("%s\n",lookupST("hdjlashfldkja",symT));
 //     printf("%s\n",lookupST("end",symT));
 
-
-
 // 	return 0;
 // }
-
-
-
