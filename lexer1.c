@@ -2,18 +2,8 @@
 #include<ctype.h>
 #include<stdlib.h>
 #include <string.h>
-#include "symboltable.c"
-#define L_size 10000
+#include "lexer.h"
 
-typedef struct lexeme{
-    char* lexe;
-    char* token;
-    int line_no;
-}lexeme;
-typedef struct lex_header{
-    int size;
-    lexeme* arr[L_size];
-}lex_header;
 lexeme* new_lex(char* c,char* t,int lineno){
     lexeme* L=(lexeme*)malloc(sizeof(lexeme));
     L->lexe=c;
@@ -49,6 +39,7 @@ int isAlpha(char c)
     return 0;
 }
 
+//Buffering
 #define BUFFERSIZE 100
 FILE * fp;
 char DoubleBuffer[2][BUFFERSIZE];

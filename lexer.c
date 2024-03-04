@@ -1,8 +1,10 @@
+// DEPRICIATED @04-02-2024 3:10pm
+
 #include<stdio.h>
 #include<ctype.h>
 #include<stdlib.h>
 #include<string.h>
-#include "lexer.h"
+// #include "lexer.h"
 
 void concatenate_string(char* s,int j, char* s1)
 {

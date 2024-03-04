@@ -1,19 +1,8 @@
 #include <stdio.h>
 #include<string.h>
 #include<stdlib.h>
-#define TSIZE 1000
-struct bucketNode{
-    char*key;
-    char*val;
-    struct bucketNode*next;
-};
-struct symbolTable{
-    int currSize;
-    int totalSize;
-    struct bucketNode* table[TSIZE];
-};
-typedef struct bucketNode bucketNode;
-typedef struct symbolTable symTable;
+#include "lexer.h"
+
 
 
 bucketNode* initbucketNode(char*key, char*val){
