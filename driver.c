@@ -5,7 +5,7 @@
 
 #include "lexer.h"
 
-int print_options(){
+void print_options(){
 	printf("Select one of the following options :\n");
 	printf("Press 0 : To exit the program\n");
 	printf("Press 1 : For removal of comments\n");
@@ -24,37 +24,46 @@ void print_intro(){
 	printf("\n");
 }
 
-void print_token_list(FILE* fp){
+void print_token_list(FILE* fp, symTable* map, lex_header* lex){
 	getStream(fp);
-	print(fp);
+	print(fp, map, lex);
+}
+
+void remove_comments(FILE* fp){
+  getStream(fp);
+  removeComments(fp);
 }
 
 int main(){
 	int option;
+
 	FILE* fp;
 	fp = fopen("TestCases/t2.txt","r");
+
+  symTable* map = initsymbolTable();
+  lex_header* lex_list = create_Larray();
+
 	while (1){
 		print_options();
 		scanf("%d",&option);
 		switch (option){
 			case 0:
-			printf("0\n");
-			break;
+			  printf("0\n");
+			  break;
 			case 1:
-			printf("1\n");
-			break;
+			  remove_comments(fp);
+			  break;
 			case 2:
-			printf("2\n");
-			print_token_list(fp);
-			break;
+			  print_token_list(fp, map, lex_list);
+			  break;
 			case 3:
-			printf("3\n");
-			break;
+			  printf("3\n");
+			  break;
 			case 4:
-			printf("4\n");
-			break;
+			  printf("4\n");
+			  break;
 			default:
-			printf("Please choose a Valid Option\n");
+			  printf("Please choose a Valid Option\n");
 		}
 		if(option==0){
 			printf("-------Exiting-------\n");

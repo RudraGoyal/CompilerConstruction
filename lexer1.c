@@ -734,6 +734,26 @@ void print(FILE* fp,symTable* map,lex_header* lex_list)
 
 }
 
+void removeComments(FILE *fp){
+  int beg=0;
+  int end=0; 
+  char inp = read(&end, fp);
+  while (inp!=EOF)
+  {
+      if(inp=='%'){
+          while(inp!='\n' && inp!=EOF){
+              inp=read(&end, fp);;
+          }
+      }
+      if(inp==EOF)
+      break;
+      printf("%c",inp);
+      inp=read(&end, fp);;
+  }
+  printf("\n");
+  rewind(fp);
+}
+
 // int main()
 // {
 //     //need to link symbol table file
