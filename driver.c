@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "lexer.h"
-#include "lexer1.c"
+// #include "lexer.c"
 #include "parser.h"
 
 int print_options()
@@ -67,12 +67,12 @@ int main(int argc, char const *argv[])
 			printf("4\n");
 			break;
 		default:
-			printf("Please choose a Valid Option\n");
+			printf("-----------------Please choose a Valid Option-----------------\n");
 		}
 		rewind(fp);
 		if (option == 0)
 		{
-			printf("-------Exiting-------\n");
+			printf("----------------------------Exiting--------------------------\n");
 			break;
 		}
 	}

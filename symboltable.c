@@ -2,7 +2,7 @@
 #include<string.h>
 #include<stdlib.h>
 #define TSIZE 1000
-#include "lexer.h"
+// #include "lexer.h"
 
 bucketNode* initbucketNode(char*key, char*val){
     bucketNode*node=(bucketNode*)malloc(sizeof(bucketNode));

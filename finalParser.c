@@ -4,8 +4,8 @@
 #include<string.h>
 #include "stack.c"
 #include "hashmap.c"
-#include "lexer1.c"
-#include "parser.h"
+#include "lexer.h"
+// #include "parser.h"
 
 int tokens=58;
 int max_gram_len=8;
@@ -143,14 +143,16 @@ void createParseTable(first_node**firstArr,hashmap*h2,first_follow_node**followA
     }
 }
 
-
-
 void printParseTree(parseTreeNode*root,char *outfile){
-    // add file handle later
     FILE* outline = fopen(outfile,"w");
+    printParseTreeRecursive(root,outline);
+}
+
+void printParseTreeRecursive(parseTreeNode*root, FILE *outline){
+    // add file handle later
     parseTreeNode*p=root->childHead;
     while(p!=NULL && p->next!=NULL){
-        printParseTree(p,outline);
+        printParseTreeRecursive(p,outline);
         p=p->next;
     }
     if(root->isLeafNode==1 && (root->token_name=="TK_NUM" || root->token_name=="TK_RNUM"))
@@ -159,7 +161,7 @@ void printParseTree(parseTreeNode*root,char *outfile){
     fprintf(outline,"%-25s\t%-*d\t%-15s\t%-10s\t%-25s\t%-6s\t%s\n",root->lexeme,5,root->line_no,root->token_name,NULL,root->parent->nodeSymbol,"yes",root->nodeSymbol);
     else
 	fprintf(outline,"%-25s\t%-*d\t%-15s\t%-10s\t%-25s\t%-6s\t%s\n",root->lexeme,5,root->line_no,root->token_name,root->value,root->parent->nodeSymbol,"no",root->nodeSymbol);
-    if(p!=NULL) printParseTree(p,outline);
+    if(p!=NULL) printParseTreeRecursive(p,outline);
 }
 
 
@@ -1293,8 +1295,16 @@ void mainParser(FILE *fp, char *outfile){
     // fp = fopen("text.txt", "r");
     getStream(fp);
     print(fp,map,input);
-    char* u="$"; 
-    lexeme* lex=new_lex("$",u,Line_No);
+    char* u="$";
+
+    rewind(fp);
+    int local_line_no = 1;
+    char c;
+    for (c = getc(fp); c != EOF; c = getc(fp))
+        if (c == '\n') // Increment count if this character is newline
+            local_line_no = local_line_no + 1;
+
+    lexeme* lex=new_lex("$",u,local_line_no);
     add_lex(input,lex);
     struct List*l=GRAMMAR();
     createParseTable(firstArr,h2,followArr,l,parseT);
