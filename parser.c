@@ -193,7 +193,7 @@ void parser(stack*st,lex_header*inp1,char*parseT[][tokens][max_gram_len], hashma
         // if(strcmp(entry->str,"<primitiveDatatype>")==0) {
         //     aalo=5;
         // } 
-        printf("%s \n",entry->str); //use this for debugging
+        // printf("%s \n",entry->str); //use this for debugging
         pop(st);
         // printf("a=%d  b=%d\n",a,b);
         while((k<max_gram_len) && (parseT[a][b][k]!=NULL) && (strcmp(parseT[a][b][k],"ERROR")!=0) && (strcmp(parseT[a][b][k],"syn")!=0) && (b!=-1)){
@@ -1310,12 +1310,12 @@ void mainParser(FILE *fp, char *outfile){
     struct List*l=GRAMMAR();
     createParseTable(firstArr,h2,followArr,l,parseT);
 
-    printf("----------------------parser started----------------------");
+    // printf("----------------------parser started----------------------");
     parser(st,input,parseT,h1,h2);
     printf("\n");
     // FILE*fptr = fopen(outfile, "w");
-    printf("----------------------print started----------------------");
+    // printf("----------------------print started----------------------");
     printParseTree(root,outfile);
-    printf("----------------------parser ended----------------------");
+    // printf("----------------------parser ended----------------------");
     init_lexer_vars();
 }

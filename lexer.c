@@ -870,23 +870,7 @@ void removeComments(FILE *fp)
         printf("%c", c);
         c = fgetc(fp);
     }
-    printf("\n");
+    printf("\n\n");
     init_lexer_vars();
     rewind(fp);
 }
-
-// int main()
-// {
-//     //need to link symbol table file
-//     symTable* map=initsymbolTable();
-//     lex_header* lex_list=create_Larray();
-//     fp = fopen("text.txt", "r");
-//     getStream(fp);
-//     // printf("%s", DoubleBuffer[0]);
-//     print(fp,map,lex_list);
-
-//     for(int i=0;i<lex_list->size;i++){
-//         printf("%s      %d      %s\n",lex_list->arr[i]->lexe,lex_list->arr[i]->line_no,lex_list->arr[i]->token);
-//     }
-//     return 0;
-// }
