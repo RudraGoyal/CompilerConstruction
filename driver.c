@@ -2,8 +2,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "lexer1.c"
+#include "lexer.h"
 
 int print_options()
 {

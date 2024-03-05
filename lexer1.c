@@ -2,18 +2,10 @@
 #include<ctype.h>
 #include<stdlib.h>
 #include <string.h>
+#include "lexer.h"
 #include "symboltable.c"
 #define L_size 10000
 
-typedef struct lexeme{
-    char* lexe;
-    char* token;
-    int line_no;
-}lexeme;
-typedef struct lex_header{
-    int size;
-    lexeme* arr[L_size];
-}lex_header;
 lexeme* new_lex(char* c,char* t,int lineno){
     lexeme* L=(lexeme*)malloc(sizeof(lexeme));
     L->lexe=c;
@@ -803,18 +795,23 @@ void print(FILE* fp,symTable* map,lex_header* lex_list)
 
 }
 
-// int main()
-// {
-//     //need to link symbol table file
-//     symTable* map=initsymbolTable();
-//     lex_header* lex_list=create_Larray();
-//     fp = fopen("text.txt", "r");
-//     getStream(fp);
-//     // printf("%s", DoubleBuffer[0]);
-//     print(fp,map,lex_list);
-
-//     for(int i=0;i<lex_list->size;i++){
-//         printf("%s      %d      %s\n",lex_list->arr[i]->lexe,lex_list->arr[i]->line_no,lex_list->arr[i]->token);
-//     }
-//     return 0;
-// }
+void removeComments(FILE *fp)
+{
+    char c = fgetc(fp);
+    while (c != EOF)
+    {
+        if (c == '%')
+        {
+            while (c != '\n' && c != EOF)
+            {
+                c = fgetc(fp);
+            }
+        }
+        if (c == EOF)
+            break;
+        printf("%c", c);
+        c = fgetc(fp);
+    }
+    printf("\n");
+    rewind(fp);
+}
