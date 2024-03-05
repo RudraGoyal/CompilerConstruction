@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "lexer.h"
+#include <time.h>
 // #include "lexer.c"
 #include "parser.h"
 
@@ -35,9 +36,12 @@ void print_token_list(FILE *fp, symTable *map, lex_header *lex_list)
 
 int main(int argc, char const *argv[])
 {
+	clock_t t;
+	int f;
 	symTable *map = initsymbolTable();
 	lex_header *lex_list = create_Larray();
 	int option;
+	float t1 = -1, t2 = -1, t3 = -1;
 	char *testfile = argv[1];
 	char *outfile = argv[2];
 	FILE *fp;
@@ -57,14 +61,19 @@ int main(int argc, char const *argv[])
 			break;
 		case 2:
 			printf("2\n");
-			print_token_list(fp, map, lex_list);
 			break;
 		case 3:
 			printf("3\n");
-			mainParser(fp,outfile);
+			print_token_list(fp, map, lex_list);
+			
 			break;
 		case 4:
 			printf("4\n");
+			t = clock();
+			print_token_list(fp, map, lex_list);
+			print_token_list(fp, map, lex_list);
+			t = clock() - t;
+			printf("TIME ==  (%f seconds).\n", ((float)t) / CLOCKS_PER_SEC);
 			break;
 		default:
 			printf("-----------------Please choose a Valid Option-----------------\n");
