@@ -1,9 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
 
 #ifndef LEXERH
 #define LEXERH
 
+#include <stdio.h>
+#include <stdlib.h>
 // SYMBOLTABLE.C Structs and Functions
 
 #define TSIZE 1000
