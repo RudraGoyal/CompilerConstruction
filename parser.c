@@ -4,14 +4,24 @@
 #include<string.h>
 #include "stack.c"
 #include "hashmap.c"
+#include "lexer1.c"
 
 int tokens=6;
 int max_gram_len=3;
 int line_no=8;
 
-void printParseTree(parseTreeNode*root){
+
+void printParseTree(parseTreeNode*root,FILE*outline){
     // add file handle later
-    printf("%s\n",root->childHead->nodeSymbol);
+    parseTreeNode*p=root->childHead;
+    while(p!=NULL && p->next!=NULL){
+        printParseTree(p,outline);
+        p=p->next;
+    }
+    if(root->isLeafNode==1)
+    fprintf(outline,"%s          %d          %s          %s          %s          %s          %s\n",root->lexeme,root->line_no,root->token_name,root->value,root->parent->nodeSymbol,"yes",root->nodeSymbol);
+    else fprintf(outline,"%s          %d          %s          %s          %s          %s          %s\n",root->lexeme,root->line_no,root->token_name,root->value,root->parent->nodeSymbol,"no",root->nodeSymbol);
+    if(p!=NULL) printParseTree(p,outline);
 }
 
 
@@ -50,7 +60,7 @@ void parser(stack*st,char*parseT[][tokens][max_gram_len],char**inp, hashmap*h1,h
                 
                 else{
                     // do remember to put symbol table instance as its not showing error
-                    parseTreeNode*n2=initParseTreeNode(input,line_no,"TK_fromsymt",input,parent,NULL,1);
+                    parseTreeNode*n2=initParseTreeNode(input,line_no,input,input,parent,NULL,1);
                     push(st,parseT[a][b][k],0,n2);
                     n2->next=parent->childHead;
                     parent->childHead=n2;
@@ -118,9 +128,25 @@ int main(){
     parseTreeNode*root=initParseTreeNode("----",0,NULL,NULL,root1,"E",0);
     push(st,"E",1,root);
     // printf("%s\n",parseT[0][0][0]);
-     parser(st,parseT,(char**)inp,h1,h2,terminals);
+    // lex_header*input=(lex_header*)malloc(sizeof(lex_header));
+    // FILE*foo=fopen("text.txt","r");
+    // symTable* map=initsymbolTable();
+    // print(foo,map,input);
+
+    symTable* map=initsymbolTable();
+    lex_header* input=create_Larray();
+    fp = fopen("text.txt", "r");
+    getStream(fp);
+    print(fp,map,input);
+
+    for(int i=0;i<input->size;i++){
+        printf("%s      %d      %s\n",input->arr[i]->lexe,input->arr[i]->line_no,input->arr[i]->token);
+    }
+    parser(st,parseT,(char**)inp,h1,h2,terminals);
     // 1 non terminal 0 terminal
-    printParseTree(root);
+    printf("\n");
+    FILE*fptr = fopen("parseTreeOutput.txt", "w");
+    printParseTree(root,fptr);
 
 
 }

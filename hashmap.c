@@ -18,8 +18,9 @@ typedef struct hashTable hashmap;
 
 hashNode* inithashNode(char*key, int val){
     hashNode*node=(hashNode*)malloc(sizeof(hashNode));
-    node->key=(char*)malloc(strlen(key));
+    node->key=(char*)malloc(sizeof(char)*(strlen(key)+1));
     strcpy(node->key,key);
+    // node->key[strlen(key)]='\0';
     // node->key=key;
     node->val=val;
     node->next=NULL;

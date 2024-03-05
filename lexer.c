@@ -1,10 +1,7 @@
-// DEPRICIATED @04-02-2024 3:10pm
-
 #include<stdio.h>
 #include<ctype.h>
 #include<stdlib.h>
 #include<string.h>
-// #include "lexer.h"
 
 void concatenate_string(char* s,int j, char* s1)
 {
@@ -38,7 +35,8 @@ int getStream(FILE *fp)
 {
     if(fp == NULL)
     {
-        printf("Error \n");
+        printf("Error /n");
+        
     }
     if(p==1)
     {
@@ -91,7 +89,7 @@ char read(int* end, FILE* fp)
 char* ret_lexeme_error(int beg, int end)
 {
 if(merge==1 && beg<=end) merge=0;
-//  if(Line_No>14) exit(0);
+ if(Line_No>14) exit(0);
 if(merge == 0)
 {
     char* ans = (char*)malloc(sizeof(char)*(end-beg+2));
@@ -124,7 +122,7 @@ else{
 char* ret_lexeme(int beg, int end)
 {
 if(merge==1 && beg<=end) merge=0;
-// if(Line_No>14) exit(0);
+ if(Line_No>14) exit(0);
 if(merge == 0)
 {
     char* ans = (char*)malloc(sizeof(char)*(end-beg+2));
@@ -561,11 +559,11 @@ void print(FILE* fp)
 
 }
 
-// int main()
-// {
-//     fp = fopen("text.txt", "r");
-//     getStream(fp);
-//     // printf("%s", DoubleBuffer[0]);
-//     print(fp);
-//     return 0;
-// }
+int main()
+{
+    fp = fopen("text.txt", "r");
+    getStream(fp);
+    // printf("%s", DoubleBuffer[0]);
+    print(fp);
+    return 0;
+}

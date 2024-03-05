@@ -4,6 +4,7 @@
 #include "hashmap.c"
 #define listsize 1000
 
+
 char LIST_terminals[10000][10000];
 char  LIST_nonterminals[10000][10000];
 int i_t=0;
@@ -37,6 +38,7 @@ struct grammar_rule_node
 int is_Parsed;
 struct lexeme* lex;
 struct grammar_rule_node* next;
+int from_which;
 };
 
 typedef struct grammar_rule_node grammar;
@@ -265,6 +267,7 @@ for(int i=0; i<i_nt; i++)
 			{
 						struct lexeme* l = create_lexeme("eps");
 						struct grammar_rule_node* Temp = create_grammar_rule_node();
+						Temp->from_which = temp->index;
 						Temp->lex = l; 
 						if(FS->LIST[i] == NULL)
 							FS->LIST[i] = Temp;
@@ -294,6 +297,7 @@ for(int i=0; i<i_nt; i++)
 							
 							struct lexeme* l = create_lexeme(gnode->lex->lexeme);
 							struct grammar_rule_node* Temp = create_grammar_rule_node();
+							Temp->from_which = temp->index;
 							Temp->lex = l; 
 							if(FS->LIST[i] == NULL)
 								FS->LIST[i] = Temp;
@@ -324,6 +328,7 @@ for(int i=0; i<i_nt; i++)
 							{
 								struct lexeme* l = create_lexeme(temp1->lex->lexeme);
 								struct grammar_rule_node* Temp = create_grammar_rule_node();
+								Temp->from_which = temp->index;
 								Temp->lex = l; 
 								if(FS->LIST[i] == NULL)
 									FS->LIST[i] = Temp;
@@ -362,6 +367,7 @@ for(int i=0; i<i_nt; i++)
 							{
 								struct lexeme* l = create_lexeme(temp1->lex->lexeme);
 								struct grammar_rule_node* Temp = create_grammar_rule_node();
+								Temp->from_which = temp->index;
 								Temp->lex = l; 
 								if(FS->LIST[i] == NULL)
 									FS->LIST[i] = Temp;
@@ -427,32 +433,32 @@ for(int i=0; i<i_nt; i++)
 printf("%s  %d \n", LIST_nonterminals[i],i);
 }
 
-for(int i=0; i<i_nt; i++)
-{
-containerNode* curr = C[i];
-printf("%d ==> ",i);
-while(curr != NULL)
-{
-printf("%d ", curr->index);
-curr = curr->next;
-}
-printf("\n");
-}
-printf("\n");
+// for(int i=0; i<i_nt; i++)
+// {
+// containerNode* curr = C[i];
+// printf("%d ==> ",i);
+// while(curr != NULL)
+// {
+// printf("%d ", curr->index);
+// curr = curr->next;
+// }
+// printf("\n");
+// }
+// printf("\n");
 
 struct GRAMMAR* FS = populate_FS(G, C);
 
-for(int i=0; i<i_nt; i++)
-{
-containerNode* curr = C[i];
-printf("%d ==> ",i);
-while(curr != NULL)
-{
-printf("%d ", curr->index);
-curr = curr->next;
-}
-printf("\n");
-}
+// for(int i=0; i<i_nt; i++)
+// {
+// containerNode* curr = C[i];
+// printf("%d ==> ",i);
+// while(curr != NULL)
+// {
+// printf("%d ", curr->index);
+// curr = curr->next;
+// }
+// printf("\n");
+// }
 
 for(int i=0; i<i_nt; i++)
 {
@@ -462,7 +468,7 @@ for(int i=0; i<i_nt; i++)
 		struct grammar_rule_node* temp = FS->LIST[i];
 		while(temp != NULL)
 		{
-			printf("%s ", temp->lex->lexeme);
+			printf("[%s from %d] ", temp->lex->lexeme, temp->from_which);
 			temp = temp->next;
 		}
 	}
