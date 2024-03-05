@@ -153,10 +153,10 @@ void printParseTree(parseTreeNode*root,FILE*outline){
         p=p->next;
     }
     if(root->isLeafNode==1 && (root->token_name=="TK_NUM" || root->token_name=="TK_RNUM"))
-    fprintf(outline,"%s          %d          %s          %s          %s          %s          %s\n",root->lexeme,root->line_no,root->token_name,root->value,root->parent->nodeSymbol,"yes",root->nodeSymbol);
+    fprintf(outline,"%s          %d          %s          %f          %s          %s          %s\n",root->lexeme,root->line_no,root->token_name,root->value,root->parent->nodeSymbol,"yes",root->nodeSymbol);
     else if(root->isLeafNode==1)
-    fprintf(outline,"%s          %d          %s          %s          %s          %s          %s\n",root->lexeme,root->line_no,root->token_name,NULL,root->parent->nodeSymbol,"yes",root->nodeSymbol);
-    else fprintf(outline,"%s          %d          %s          %s          %s          %s          %s\n",root->lexeme,root->line_no,root->token_name,root->value,root->parent->nodeSymbol,"no",root->nodeSymbol);
+    fprintf(outline,"%s          %d          %s          %f          %s          %s          %s\n",root->lexeme,root->line_no,root->token_name,NULL,root->parent->nodeSymbol,"yes",root->nodeSymbol);
+    else fprintf(outline,"%s          %d          %s          %f         %s          %s          %s\n",root->lexeme,root->line_no,root->token_name,root->value,root->parent->nodeSymbol,"no",root->nodeSymbol);
     if(p!=NULL) printParseTree(p,outline);
 }
 
@@ -193,14 +193,14 @@ void parser(stack*st,lex_header*inp1,char*parseT[][tokens][max_gram_len], hashma
         // printf("a=%d  b=%d\n",a,b);
         while((k<max_gram_len) && (parseT[a][b][k]!=NULL) && (strcmp(parseT[a][b][k],"ERROR")!=0) && (strcmp(parseT[a][b][k],"syn")!=0) && (b!=-1)){
                 if(lookup(parseT[a][b][k],h2)==-1){
-                    parseTreeNode*n1=initParseTreeNode("----",inp1->arr[inpptr]->line_no,NULL,NULL,parent,parseT[a][b][k],0);
+                    parseTreeNode*n1=initParseTreeNode("----",inp1->arr[inpptr]->line_no,NULL,0,parent,parseT[a][b][k],0);
                     push(st,parseT[a][b][k],1,n1); 
                     n1->next=parent->childHead;
                     parent->childHead=n1;
                 }
                 
                 else{
-                    parseTreeNode*n2=initParseTreeNode(inp1->arr[inpptr]->lexe,inp1->arr[inpptr]->line_no,inp1->arr[inpptr]->token,inp1->arr[inpptr]->lexe,parent,NULL,1);
+                    parseTreeNode*n2=initParseTreeNode(inp1->arr[inpptr]->lexe,inp1->arr[inpptr]->line_no,inp1->arr[inpptr]->token,inp1->arr[inpptr]->value,parent,NULL,1);
                     push(st,parseT[a][b][k],0,n2);
                     n2->next=parent->childHead;
                     parent->childHead=n2;
@@ -1294,8 +1294,8 @@ int main(){
     stack*st=initStack();
 
     push(st,"$",0,NULL);
-    parseTreeNode*root1=initParseTreeNode(NULL,-1,NULL,NULL, NULL,"ROOT",0);
-    parseTreeNode*root=initParseTreeNode("----",0,NULL,NULL,root1,"<program>",0);
+    parseTreeNode*root1=initParseTreeNode(NULL,-1,NULL,0, NULL,"ROOT",0);
+    parseTreeNode*root=initParseTreeNode("----",0,NULL,0,root1,"<program>",0);
     push(st,"<program>",1,root);
     // printf("%s\n",parseT[0][0][0]);
     // lex_header*input=(lex_header*)malloc(sizeof(lex_header));
