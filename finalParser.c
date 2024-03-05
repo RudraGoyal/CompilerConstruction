@@ -5,7 +5,7 @@
 #include "stack.c"
 #include "hashmap.c"
 #include "lexer1.c"
-
+#include "parser.h"
 
 int tokens=58;
 int max_gram_len=8;
