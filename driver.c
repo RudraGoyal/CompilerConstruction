@@ -4,7 +4,7 @@
 #include <string.h>
 #include "lexer.h"
 #include "lexer1.c"
-// #include "finalParser.c"
+#include "parser.h"
 
 int print_options()
 {
