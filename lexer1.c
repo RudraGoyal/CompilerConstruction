@@ -42,13 +42,23 @@ int isAlpha(char c)
 }
 
 #define BUFFERSIZE 100
-FILE * fp;
+FILE *fp;
 char DoubleBuffer[2][BUFFERSIZE];
-int p = 1; 
-int preend=-1;
+int p;
+int preend;
 int readSize;
-int merge = 0;
-int Line_No = 1;
+int merge;
+int Line_No;
+
+void init_lexer_vars()
+{
+    p = 1;
+    preend = -1;
+    readSize;
+    merge = 0;
+    Line_No = 1;
+}
+
 int getStream(FILE *fp)
 {
     if(fp == NULL)
@@ -792,7 +802,8 @@ void print(FILE* fp,symTable* map,lex_header* lex_list)
         break;
     }
     }
-
+  init_lexer_vars();
+  rewind(fp);
 }
 
 void removeComments(FILE *fp)
