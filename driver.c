@@ -31,13 +31,17 @@ void print_token_list(FILE *fp, symTable *map, lex_header *lex_list)
 	print(fp, map, lex_list);
 }
 
-int main()
+int main(int argc, char const *argv[])
 {
 	symTable *map = initsymbolTable();
 	lex_header *lex_list = create_Larray();
 	int option;
+	char *testfile = argv[1];
+	char *outfile = argv[2];
 	FILE *fp;
-	fp = fopen("TestCases/t2.txt", "r");
+	printf("%s\n",testfile);
+	printf("%s\n",outfile);
+	fp = fopen(testfile, "r");
 	while (1)
 	{
 		print_options();
