@@ -4,8 +4,9 @@
 #include<string.h>
 #include "stack.c"
 #include "hashmap.c"
-#include "lexer1.c"
+#include "lexer.h"
 
+// #include "parser.h"
 
 int tokens=58;
 int max_gram_len=8;
@@ -143,21 +144,25 @@ void createParseTable(first_node**firstArr,hashmap*h2,first_follow_node**followA
     }
 }
 
+void printParseTree(parseTreeNode*root,char *outfile){
+    FILE* outline = fopen(outfile,"w");
+    printParseTreeRecursive(root,outline);
+}
 
-
-void printParseTree(parseTreeNode*root,FILE*outline){
+void printParseTreeRecursive(parseTreeNode*root, FILE *outline){
     // add file handle later
     parseTreeNode*p=root->childHead;
     while(p!=NULL && p->next!=NULL){
-        printParseTree(p,outline);
+        printParseTreeRecursive(p,outline);
         p=p->next;
     }
     if(root->isLeafNode==1 && (root->token_name=="TK_NUM" || root->token_name=="TK_RNUM"))
-    fprintf(outline,"%s          %d          %s          %f          %s          %s          %s\n",root->lexeme,root->line_no,root->token_name,root->value,root->parent->nodeSymbol,"yes",root->nodeSymbol);
+    fprintf(outline,"%-25s\t%-*d\t%-15s\t%-10s\t%-25s\t%-6s\t%s\n",root->lexeme,5,root->line_no,root->token_name,root->value,root->parent->nodeSymbol,"yes",root->nodeSymbol);
     else if(root->isLeafNode==1)
-    fprintf(outline,"%s          %d          %s          %f          %s          %s          %s\n",root->lexeme,root->line_no,root->token_name,NULL,root->parent->nodeSymbol,"yes",root->nodeSymbol);
-    else fprintf(outline,"%s          %d          %s          %f         %s          %s          %s\n",root->lexeme,root->line_no,root->token_name,root->value,root->parent->nodeSymbol,"no",root->nodeSymbol);
-    if(p!=NULL) printParseTree(p,outline);
+    fprintf(outline,"%-25s\t%-*d\t%-15s\t%-10s\t%-25s\t%-6s\t%s\n",root->lexeme,5,root->line_no,root->token_name,NULL,root->parent->nodeSymbol,"yes",root->nodeSymbol);
+    else
+	fprintf(outline,"%-25s\t%-*d\t%-15s\t%-10s\t%-25s\t%-6s\t%s\n",root->lexeme,5,root->line_no,root->token_name,root->value,root->parent->nodeSymbol,"no",root->nodeSymbol);
+    if(p!=NULL) printParseTreeRecursive(p,outline);
 }
 
 
@@ -695,7 +700,7 @@ struct List* l =  create_List();
  return l;
 }
 
-int main(){
+void mainParser(FILE *fp, char *outfile){
     char*parseT[non_tokens][tokens][max_gram_len];
     for(int i=0;i<non_tokens;i++){
         for(int j=0;j<57;j++){
@@ -820,18 +825,6 @@ int main(){
     insert("TK_AS", 56, h2);
     insert("$",57,h2);
 
-    // hashmap*terminals=inithashmap();
-    // insert("id",0,terminals);
-    // insert("+",0,terminals);
-    // insert("*",0,terminals);
-    // insert(")",0,terminals);
-    // insert("(",0,terminals);
-
-    // parseT[0][0][0]="<otherFunctions>"; parseT[0][0][1]="<mainFunction>";
-    // parseT[0][3][0]="<otherFunctions>"; parseT[0][3][1]="<mainFunction>";
-    // parseT[1][3][0]="<otherFunctions>"; parseT[1][3][1]="<mainFunction>";
-    // parseT[1][0][0]=NULL;
-
     first_node**firstArr=(first_node**)malloc(sizeof(first_node*)*non_tokens);
     first_follow_node**followArr=(first_follow_node**)malloc(sizeof(first_follow_node*)*non_tokens);
 
@@ -844,11 +837,6 @@ int main(){
     // populate_node(node1,"TK_MAIN");
     // node1->next=firstArr[0];
     // firstArr[0]=node1;
-    // firstFollow(firstArr, "TK_MAIN", 0,0);
-    // firstFollow(firstArr, "eps", 0,0);
-    // firstFollow(firstArr, "TK_FUNID", 0,0);
-    // firstFollow(firstArr, "TK_FUNID", 1,2);
-    // firstFollow(firstArr, "eps", 1,3);
     firstFollow(firstArr, "TK_MAIN", 0, 0);
     firstFollow(firstArr, "eps", 0, 0);
     firstFollow(firstArr, "TK_FUNID", 0, 0);
@@ -1305,43 +1293,26 @@ int main(){
 
     symTable* map=initsymbolTable();
     lex_header* input=create_Larray();
-    fp = fopen("text.txt", "r");
+    // fp = fopen("text.txt", "r");
     getStream(fp);
     print(fp,map,input);
-    char* u="$"; 
-    lexeme* lex=new_lex("$",u,Line_No);
+    char* u="$";
+
+    rewind(fp);
+    int local_line_no = 1;
+    char c;
+    for (c = getc(fp); c != EOF; c = getc(fp))
+        if (c == '\n') // Increment count if this character is newline
+            local_line_no = local_line_no + 1;
+
+    lexeme* lex=new_lex("$",u,local_line_no);
     add_lex(input,lex);
     struct List*l=GRAMMAR();
-    // printf("%s  grammar\n",l->LIST[34]->value);
     createParseTable(firstArr,h2,followArr,l,parseT);
-    // printf("checker %s    %s    %s   %s    %s    %s",parseT[20][20][0],parseT[20][20][1],parseT[20][20][2],parseT[20][20][3],parseT[20][20][4],parseT[20][20][5]);
-
-    // for(int i=0;i<input->size;i++){
-    //     printf("%s      %d      %s\n",input->arr[i]->lexe,input->arr[i]->line_no,input->arr[i]->token);
-    // }
 
     parser(st,input,parseT,h1,h2);
-    // 1 non terminal 0 terminal
     printf("\n");
-    FILE*fptr = fopen("parseTreeOutput.txt", "w");
-    printParseTree(root,fptr);
-    // for(int i=0;i<53;i++){
-    // first_node*temp;
-    // temp=firstArr[i];
-    // while(temp){
-    // printf("%s   %d  ",temp->token,temp->rule);
-    // temp=temp->next;
-    // }
-    // printf("\n");
-    // }
-
-    // for(int i=0;i<54;i++){
-    //     for(int j=0;j<57;j++){
-    //         for(int k=0;k<2;k++)
-    //         printf("%s  ",parseT[i][j][k]);
-           
-    //     }
-    //      printf("\n");
-    // }
+    // FILE*fptr = fopen(outfile, "w");
+    printParseTree(root,outfile);
 
 }
