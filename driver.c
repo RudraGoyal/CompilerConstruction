@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "lexer.h"
+#include "lexer1.c"
+#include "finalParser.c"
 
 int print_options()
 {
@@ -39,8 +41,6 @@ int main(int argc, char const *argv[])
 	char *testfile = argv[1];
 	char *outfile = argv[2];
 	FILE *fp;
-	printf("%s\n",testfile);
-	printf("%s\n",outfile);
 	fp = fopen(testfile, "r");
 	while (1)
 	{
@@ -61,6 +61,7 @@ int main(int argc, char const *argv[])
 			break;
 		case 3:
 			printf("3\n");
+			mainParser(fp,outfile);
 			break;
 		case 4:
 			printf("4\n");

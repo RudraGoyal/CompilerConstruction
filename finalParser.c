@@ -145,8 +145,9 @@ void createParseTable(first_node**firstArr,hashmap*h2,first_follow_node**followA
 
 
 
-void printParseTree(parseTreeNode*root,FILE*outline){
+void printParseTree(parseTreeNode*root,char *outfile){
     // add file handle later
+    FILE* outline = fopen(outfile,"w");
     parseTreeNode*p=root->childHead;
     while(p!=NULL && p->next!=NULL){
         printParseTree(p,outline);
@@ -696,7 +697,7 @@ struct List* l =  create_List();
  return l;
 }
 
-int main(){
+void mainParser(FILE *fp, char *outfile){
     char*parseT[non_tokens][tokens][max_gram_len];
     for(int i=0;i<non_tokens;i++){
         for(int j=0;j<57;j++){
@@ -1289,7 +1290,7 @@ int main(){
 
     symTable* map=initsymbolTable();
     lex_header* input=create_Larray();
-    fp = fopen("text.txt", "r");
+    // fp = fopen("text.txt", "r");
     getStream(fp);
     print(fp,map,input);
     char* u="$"; 
@@ -1300,7 +1301,7 @@ int main(){
 
     parser(st,input,parseT,h1,h2);
     printf("\n");
-    FILE*fptr = fopen("parseTreeOutput.txt", "w");
-    printParseTree(root,fptr);
+    // FILE*fptr = fopen(outfile, "w");
+    printParseTree(root,outfile);
 
 }
