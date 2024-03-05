@@ -4,7 +4,7 @@
 #include<string.h>
 #include "parseTree.c"
 
-int size=200;
+int size_stack=200;
 struct stackEntry{
     char*str;
     parseTreeNode* node;
@@ -19,21 +19,21 @@ typedef struct stack stack;
 
 stack*initStack(){
     stack*st=(stack*)malloc(sizeof(stack));
-    st->stackptr = (stackEntry**)malloc(sizeof(stackEntry*)*size);
+    st->stackptr = (stackEntry**)malloc(sizeof(stackEntry*)*size_stack);
     st->top=-1;
     return st;
 }
 void iffull(stack*st){
     // printf("ifful called\n");
-    size*=2;
-    st->stackptr=(stackEntry**)realloc(st->stackptr,sizeof(stackEntry*)*size);
+    size_stack*=2;
+    st->stackptr=(stackEntry**)realloc(st->stackptr,sizeof(stackEntry*)*size_stack);
 }
 void push(stack*st,char*string, int bool, parseTreeNode*n){
     stackEntry*entry=(stackEntry*)malloc(sizeof(stackEntry));
     entry->bool=bool;
     entry->str=string;
     entry->node=n;
-    if(st->top>=size-1) iffull(st);
+    if(st->top>=size_stack-1) iffull(st);
     st->top++;
     st->stackptr[st->top]=entry;
 }

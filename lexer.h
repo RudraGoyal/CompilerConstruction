@@ -7,6 +7,7 @@
 // SYMBOLTABLE.C Structs and Functions
 
 #define TSIZE 1000
+#define L_size 10000
 
 struct bucketNode
 {
@@ -32,7 +33,6 @@ symTable *initsymbolTable();
 
 // LEXER1.C Structs and Functions
 
-#define L_size 10000
 
 
 typedef struct lexeme
@@ -40,6 +40,7 @@ typedef struct lexeme
     char *lexe;
     char *token;
     int line_no;
+    float value;
 } lexeme;
 typedef struct lex_header
 {

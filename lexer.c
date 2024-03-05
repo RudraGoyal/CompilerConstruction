@@ -4,24 +4,29 @@
 #include <string.h>
 #include "lexer.h"
 #include "symboltable.c"
-
 #define L_size 10000
-#define BUFFERSIZE 100
 
 
-FILE *fp;
-char DoubleBuffer[2][BUFFERSIZE];
-int p;
-int preend;
-int readSize;
-int merge;
-int Line_No;
+
+
+double VALUE;
+
+
+int pow(int power)
+{
+    int t = 1;
+    while(power--)
+    t*=10;
+    return t;
+}
+
 
 lexeme* new_lex(char* c,char* t,int lineno){
     lexeme* L=(lexeme*)malloc(sizeof(lexeme));
     L->lexe=c;
     L->token=t;
     L->line_no=lineno;
+    L->value = 0;
     return L;
 }
 lex_header* create_Larray(){
@@ -52,7 +57,14 @@ int isAlpha(char c)
     return 0;
 }
 
-
+#define BUFFERSIZE 100
+FILE * fp;
+char DoubleBuffer[2][BUFFERSIZE];
+int p = 1; 
+int preend=-1;
+int readSize;
+int merge = 0;
+int Line_No = 1;
 
 void init_lexer_vars()
 {
@@ -62,6 +74,7 @@ void init_lexer_vars()
     merge = 0;
     Line_No = 1;
 }
+
 
 int getStream(FILE *fp)
 {
@@ -184,12 +197,14 @@ else{
 
 void print(FILE* fp,symTable* map,lex_header* lex_list)
 {   
+    
     int plag=0;
     int beg=0;
     int end=0; 
     int t = 1;
     while(t)
     {
+    VALUE = 0;
     // if(end>=BUFFERSIZE) end=0
     if(plag==1){
         int flag=0;
@@ -205,6 +220,7 @@ void print(FILE* fp,symTable* map,lex_header* lex_list)
     if(isdigit(inp))
     {
         inp = '1';
+        VALUE = (int)(inp - '0');
     }
     else if(isAlpha(inp))
     {
@@ -562,32 +578,50 @@ void print(FILE* fp,symTable* map,lex_header* lex_list)
 
     case '1' :
     end++;
+   
     while(isdigit(read(&end,fp)))
+    {
+    VALUE = VALUE*10 + (int)(inp - '0');
     end++;
+    }
     if(read(&end,fp) == '.')
     {
         end++;
         if(isdigit(read(&end,fp)))
         {
+            VALUE = VALUE +((int)(read(&end,fp) - '0'))*(0.1);
             end++;
             if(isdigit(read(&end,fp)))
             {
+                VALUE = VALUE +((int)(read(&end,fp) - '0'))*(00.1);
                 end++;
                 if(read(&end,fp) == 'E')
                 {
                     end++;
                     if(read(&end,fp) == '+' || read(&end,fp) == '-')
                     {
+                         int is_minus=-1;
+                         if(read(&end,fp) == '+')
+                         is_minus = 1;
+                         int TEMP = 0;
                          end++;
                          if(isdigit(read(&end,fp)))
                             {
+                                TEMP += (int)(read(&end,fp) - '0');
                                 end++;
                                 if(isdigit(read(&end,fp)))
                                 {
+                                    TEMP = TEMP*10 + (int)(read(&end,fp) - '0');
+                                    if(is_minus  = 1)
+                                    VALUE = VALUE*(pow(TEMP));
+                                    else 
+                                    VALUE = VALUE/(pow(TEMP));
                                     char* t="TK_RNUM";
                                     printf("TK_RNUM ");
                                     char* string=ret_lexeme(beg,end);
+                                    printf("VALUE OF NUMBER == %f \n", VALUE);
                                     lexeme* lex=new_lex(string,t,Line_No);
+                                    lex->value = VALUE;
                                     add_lex(lex_list,lex);
                                     end++;
                                 }
@@ -601,13 +635,18 @@ void print(FILE* fp,symTable* map,lex_header* lex_list)
                     }
                     else if(isdigit(read(&end,fp)))
                     {
+                        int TEMP = read(&end,fp) - '0';
                         end++;
                         if(isdigit(read(&end,fp)))
                         {
+                            int TEMP = TEMP*10 + read(&end,fp) - '0';
+                            VALUE = VALUE*pow(TEMP);
                             char* t="TK_RNUM";
                             printf("TK_RNUM "); 
                             char* string=ret_lexeme(beg,end);
                             lexeme* lex=new_lex(string,t,Line_No);
+                            printf("VALUE OF NUMBER == %f \n", VALUE);
+                            lex->value = VALUE;
                             add_lex(lex_list,lex);
                             end++;
                         }
@@ -629,6 +668,8 @@ void print(FILE* fp,symTable* map,lex_header* lex_list)
                     printf("TK_RNUM "); 
                     char* string=ret_lexeme(beg,end-1);
                     lexeme* lex=new_lex(string,t,Line_No);
+                    printf("VALUE OF NUMBR == %f \n", VALUE);
+                    lex->value = VALUE;
                     add_lex(lex_list,lex);
                                     
                 }
@@ -651,6 +692,8 @@ void print(FILE* fp,symTable* map,lex_header* lex_list)
         char* t="TK_NUM"; 
         char* string=ret_lexeme(beg,end-1);
         lexeme* lex=new_lex(string,t,Line_No);
+        printf("VALUE OF NUMBR == %f \n", VALUE);
+        lex->value = VALUE;
         add_lex(lex_list,lex);    
     }
 
@@ -806,8 +849,8 @@ void print(FILE* fp,symTable* map,lex_header* lex_list)
         break;
     }
     }
-  init_lexer_vars();
-  rewind(fp);
+    init_lexer_vars();
+
 }
 
 void removeComments(FILE *fp)
@@ -828,5 +871,22 @@ void removeComments(FILE *fp)
         c = fgetc(fp);
     }
     printf("\n");
+    init_lexer_vars();
     rewind(fp);
 }
+
+// int main()
+// {
+//     //need to link symbol table file
+//     symTable* map=initsymbolTable();
+//     lex_header* lex_list=create_Larray();
+//     fp = fopen("text.txt", "r");
+//     getStream(fp);
+//     // printf("%s", DoubleBuffer[0]);
+//     print(fp,map,lex_list);
+
+//     for(int i=0;i<lex_list->size;i++){
+//         printf("%s      %d      %s\n",lex_list->arr[i]->lexe,lex_list->arr[i]->line_no,lex_list->arr[i]->token);
+//     }
+//     return 0;
+// }
